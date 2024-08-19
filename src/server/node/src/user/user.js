@@ -7,15 +7,14 @@ const user = {
   }, 
 
   putUser: async (newUser) => {
-    const uuid = await db.putUser(newUser);
+    const userToReturn = await db.putUser(newUser);
 
-    newUser.uuid = uuid; 
-
-    return newUser;
+    return userToReturn;
   },
 
   updateHash: async (oldHash, newHash) => {
-    
+    const updatedUser = db.updateHash(oldHash, newHash);
+    return updatedUser;
   },
   
   deleteUser: async (hash) => {

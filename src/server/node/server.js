@@ -16,77 +16,110 @@ app.use((req, res, next) => {
 });
 
 app.put('/user/create', async (req, res) => {
-  const body = req.body;
-  const pubKey = body.pubKey;
-  const hash = body.hash;
-  const message = body.timestamp + hash + pubKey;
+  try {
+    const body = req.body;
+console.log(body);
+    const pubKey = body.pubKey;
+    const hash = body.hash;
+    const message = body.timestamp + hash + pubKey;
 
-  const signature = req.body.signature;
- 
-  if(!signature || !sessionless.verifySignature(signature, message, pubKey)) {
-    res.status(403);
-    return res.send({error: 'auth error'});
+    const signature = req.body.signature;
+   
+    if(!signature || !sessionless.verifySignature(signature, message, pubKey)) {
+console.log("auth error");
+      res.status(403);
+      return res.send({error: 'auth error'});
+    }
+console.log('putting user');
+    const userToPut = {
+      pubKey,
+      hash
+    };
+
+    const foundUser = await user.putUser(userToPut);
+console.log(foundUser);
+    res.send(foundUser);
+  } catch(err) {
+    res.status(404);
+    res.send({ error: 'Not Found' });
   }
-
-  const foundUser = await user.putUser(body);
-  res.send(foundUser);
 });
 
 app.get('/user/:hash', async (req, res) => {
-  const hash = req.params.hash;
-  const timestamp = req.query.timestamp;
-  const signature = req.query.signature;
-  const message = timestamp + hash;
- 
-  const foundUser = await user.getUser(hash);
+  try {
+    const hash = req.params.hash;
+    const timestamp = req.query.timestamp;
+    const signature = req.query.signature;
+    const message = timestamp + hash;
+   
+    const foundUser = await user.getUser(hash);
 
-  if(!signature || !sessionless.verifySignature(signature, message, foundUser.pubKey)) {
-    res.status(403);
-    return res.send({error: 'auth error'});
+    if(!signature || !sessionless.verifySignature(signature, message, foundUser.pubKey)) {
+      res.status(403);
+      return res.send({error: 'auth error'});
+    }
+
+    res.send(foundUser);
+  } catch(err) {
+    res.status(404);
+    res.send({ error: 'Not Found' });
   }
-
-  res.send(foundUser);
 });
 
-app.put('/user/:uuid/save-hash', async (req, res) => {
-  const uuid = req.params.uuid;
-  const body = req.body;
-  const timestamp = body.timestamp;
-  const hash = body.hash;
-  const newHash = body.newHash;
-  const signature = body.signature;
-  const message = timestamp + uuid + hash + newHash;
+app.put('/user/:uuid/update-hash', async (req, res) => {
+  try {
+    const uuid = req.params.uuid;
+    const body = req.body;
+    const timestamp = body.timestamp;
+    const hash = body.hash;
+    const newHash = body.newHash;
+    const signature = body.signature;
+    const message = timestamp + uuid + hash + newHash;
 
-  const foundUser = await user.getUser(hash);
+    const foundUser = await user.getUser(hash);
 
-  if(!signature || !sessionless.verifySignature(signature, message, foundUser.pubKey)) {
-    res.status(403);
-    return res.send({error: 'auth error'});
+    if(!signature || !sessionless.verifySignature(signature, message, foundUser.pubKey)) {
+      res.status(403);
+      return res.send({error: 'auth error'});
+    }
+
+    const updatedUser = await user.updateHash(hash, newHash);
+
+    res.status(202);
+    res.send(updatedUser);
+  } catch(err) {
+    res.status(404);
+    res.send({ error: 'Not Found' });
   }
-
-  const updatedUser = await user.updateHash(hash, newHash);
-
-  res.send(updatedUser);
 });
 
-app.delete('user/:uuid', async (req, res) => {
-  const uuid = req.params.uuid;
-  const body = req.body;
-  const timestamp = body.timestamp;
-  const hash = body.hash;
-  const signature = body.signature;
-  const message = timestamp + uuid + hash;
+app.delete('/user/:uuid', async (req, res) => {
+  try {
+    const uuid = req.params.uuid;
+    const body = req.body;
 
-  const foundUser = await user.getUser(hash);
+console.log(body);
+    const timestamp = body.timestamp;
+    const hash = body.hash;
+    const signature = body.signature;
+    const message = timestamp + uuid + hash;
+console.log("vars consted");
 
-  if(!signature || !sessionless.verifySignature(signature, message, foundUser.pubKey)) {
-    res.status(403);
-    return res.send({error: 'auth error'});
+    const foundUser = await user.getUser(hash);
+
+    if(!signature || !sessionless.verifySignature(signature, message, foundUser.pubKey)) {
+      res.status(403);
+      return res.send({error: 'auth error'});
+    }
+console.log('about to delete');
+    const success = await user.deleteUser(hash);
+console.log('success: ', success);
+    res.send({ success });
+  } catch(err) {
+console.warn(err);
+    res.status(404);
+    res.send({ error: 'Not Found' });
   }
-
-  const success = await user.deleteUser(hash);
-
-  res.send({ success });
 });
 
 app.listen(3004);
