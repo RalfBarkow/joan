@@ -150,7 +150,7 @@ signature message is: timestamp + userUUID + hash</code></summary>
 ## Databases
 
 One of the biggest benefits of Sessionless is that it doesn't need to store any sensitive data.
-This means all of the data Continue Bee cares about can all be saved in a single table/collection/whatever-other-construct-some-database-may-have.
+This means all of the data Joan cares about can all be saved in a single table/collection/whatever-other-construct-some-database-may-have.
 And that table looks like:
 
 | uuid  | pubKey | hash
@@ -177,14 +177,12 @@ To do so they should implement the following methods:
 
 ## Use cases
 
-**NOTE** Continue bee is experimental, and the instance at continuebee.com is ephemeral, and may go away or reset at any time.
-If you're making the next Palworld and want to use continuebee, you're advised to self-host it, or contact zach@planetnine.app to help him upgrade the micro instance it runs on :).
+**NOTE** Joan is experimental, and the instance at planetnine.app is ephemeral, and may go away or reset at any time.
+If you're making the next Palworld and want to use joan, you're advised to self-host it, or contact zach@planetnine.app to help him upgrade the micro instance it runs on :).
 
-* If you have a game with some state stored locally, say gems a user has acquired, and you don't want them to mess with the number of gems, you can use continuebee to save their gem number periodically, and then check that number when they return to the game.
+* You can use joan as straight auth for your backend instead of other auth providers.
 
-* You can use continuebee as straight auth for your backend instead of other auth providers.
-
-* You can use continuebee for account continuity before using more intrusive auth layers.
+* You can use joan for account continuity before using more intrusive auth layers, by utilizing other miniservices in the Planet Nine system.
 I.e. instead of having potential players bounce off because of needing to enter their email/password before playing, you can auth with continuebee, and then ask for email/password when they hit level five after they've been hooked.
 
 * Just use it as a practice backend before figuring out all the auth needs of your game/app. 
@@ -199,4 +197,5 @@ To add to this repo, feel free to make a [pull request][pr].
 
 [pr]: https://github.com/planet-nine-app/continuebee/pulls
 [sessionless]: https://www.github.com/planet-nine-app/sessionless
+[joan]: https://en.wikipedia.org/wiki/Joan_Clarke
 

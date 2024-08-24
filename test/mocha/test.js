@@ -60,7 +60,7 @@ it('should register a user', async () => {
   res.body.uuid.length.should.equal(36);
 });
 
-it('should check hash', async () => {
+it('should get uuid, and save new pubKey', async () => {
   const timestamp = new Date().getTime() + '';
   const hash = digest;
 
