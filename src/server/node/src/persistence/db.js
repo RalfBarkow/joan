@@ -1,5 +1,5 @@
 import config from '../../config/local.js';
-import { createClient } from 'redis';
+import { createClient } from './client.js';
 import sessionless from 'sessionless-node';
   
 const client = await createClient()
@@ -30,7 +30,7 @@ const db = {
   },
 
   deleteUser: async (hash) => {
-    const resp = await client.sendCommand(['DEL', `user:${hash}`]);
+    const resp = await client.del(`user:${hash}`);
 
     return true;
   }
