@@ -47,19 +47,23 @@ console.log(foundUser);
   }
 });
 
-app.get('/user/:hash', async (req, res) => {
+app.get('/user/:hash/pubKey/:pubKey', async (req, res) => {
   try {
     const hash = req.params.hash;
+    const pubKey = req.params.pubKey;
     const timestamp = req.query.timestamp;
     const signature = req.query.signature;
     const message = timestamp + hash;
    
     const foundUser = await user.getUser(hash);
 
-    if(!signature || !sessionless.verifySignature(signature, message, foundUser.pubKey)) {
+    if(!signature || !sessionless.verifySignature(signature, message, pubKey)) {
       res.status(403);
       return res.send({error: 'auth error'});
     }
+
+    foundUser.pubKey = pubKey;
+    await user.saveUser(foundUser);
 
     res.send(foundUser);
   } catch(err) {

@@ -12,6 +12,12 @@ const user = {
     return userToReturn;
   },
 
+  saveUser: async (userToUpdate) => {
+    const updatedUser = await db.saveUser(userToUpdate);
+
+    return updatedUser;
+  },
+
   updateHash: async (oldHash, newHash) => {
     const updatedUser = db.updateHash(oldHash, newHash);
     return updatedUser;

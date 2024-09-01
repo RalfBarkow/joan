@@ -21,6 +21,12 @@ const db = {
     return userToReturn;
   },
 
+  saveUser: async (user) => {
+    await client.set(`user:${user.hash}`, JSON.stringify(user));
+    const userToReturn = JSON.parse(JSON.stringify(user));
+    return userToReturn;
+  },
+
   updateHash: async (oldHash, newHash) => {
     const user = await db.getUser(oldHash);
     user.hash = newHash;
