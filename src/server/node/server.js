@@ -1,9 +1,11 @@
 import config from './config/local.js';
 import express from 'express';
+import cors from 'cors';
 import user from './src/user/user.js';
 import sessionless from 'sessionless-node';
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -124,4 +126,4 @@ console.warn(err);
 
 app.listen(3004);
 
-console.log('server listening on port 3004');
+console.log('server listening for credentials on port 3004');
