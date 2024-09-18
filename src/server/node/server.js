@@ -5,6 +5,7 @@ import user from './src/user/user.js';
 import MAGIC from './src/magic/magic.js';
 import fount from 'fount-js';
 import sessionless from 'sessionless-node';
+import db from './src/persistence/db.js';
 
 const app = express();
 app.use(cors());
@@ -131,11 +132,11 @@ app.post('/magic/spell/:spellName', async (req, res) => {
     const spell = req.body.spell;
     
     switch(spellName) {
-      case 'joinup': const resp = await MAGIC.joinup(spell);
-        return res.send(resp);
+      case 'joinup': const joinupResp = await MAGIC.joinup(spell);
+        return res.send(joinupResp);
         break;
-      case 'linkup': const resp = await MAGIC.linkup(spell);
-        return res.send(resp);
+      case 'linkup': const linkupResp = await MAGIC.linkup(spell);
+        return res.send(linkupResp);
         break;
     }
   
