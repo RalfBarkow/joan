@@ -39,6 +39,15 @@ const db = {
     const resp = await client.del(`user:${hash}`);
 
     return true;
+  },
+
+  saveKeys: async (keys) => {
+    await client.set(`keys`, JSON.stringify(keys));
+  },
+
+  getKeys: async () => {
+    const keyString = await client.get('keys');
+    return JSON.parse(keyString);
   }
 
 };
