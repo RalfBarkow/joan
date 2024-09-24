@@ -2,20 +2,29 @@ import sessionless from 'sessionless-node';
 import user from '../user/user.js';
 import db from '../persistence/db.js';
 
-sessionless.getKeys = async () => {
-  return await db.getKeys();
-};
+sessionless.generateKeys(() => {}, db.getKeys);
 
 const fountURL = 'http://localhost:3006/';
 
 const MAGIC = {
   joinup: async (spell) => {
-    const gateway = await gatewayForSpell(spell.spellName);
-    spell.gateways.push(spell);
+console.log(spell);
+    const spellName = spell.spell;
+    const gateway = await MAGIC.gatewayForSpell(spell.spellName);
+    spell.gateways.push(gateway);
 
-    const spellbook = await db.get('spellbook');
-    const nextIndex = spellbook.destinations.indexOf(spellbook.destinations.find(($) => $.stopName === 'joan'));
-    const nextDestination = spellbook.destinations[nextIndex].stopURL + '/' + spell.spellName;
+    const joan = await db.getUser('joan');
+    const spellbooks = joan.spellbooks;
+    const spellbook = spellbooks.filter(spellbook => spellbook[spellName]).pop();
+    if(!spellbook) {
+      throw new Error('spellbook not found');
+    }
+
+    const spellEntry = spellbook[spellName];
+    const currentIndex = spellEntry.destinations.indexOf(spellEntry.destinations.find(($) => $.stopName === 'joan'));
+    const nextDestination = spellEntry.destinations[currentIndex + 1].stopURL + spellName;
+
+console.log('nextDestination', nextDestination);
 
     const res = await MAGIC.forwardSpell(spell, nextDestination);
     const body = await res.json();
@@ -43,7 +52,7 @@ const MAGIC = {
       throw new Error('missing coordinating key');
     }
 
-    const gateway = await gatewayForSpell(spell.spellName);
+    const gateway = await MAGIC.gatewayForSpell(spell.spellName);
     gateway.coordinatingKey = {
       serviceURL: 'http://localhost:3004/', // Once hedy is built, this will be dynamic
       uuid: spell.casterUUID,
@@ -58,11 +67,13 @@ const MAGIC = {
 
   gatewayForSpell: async (spellName) => {
     const joan = await db.getUser('joan');
+    const uuid = joan.fountUUID;
+    const ordinal = joan.ordinal;
     const gateway = {
       timestamp: new Date().getTime() + '',
-      uuid: joan.uuid, 
+      uuid, 
       minimumCost: 20,
-      ordinal: joan.ordinal
+      ordinal
     };      
 
     const message = gateway.timestamp + gateway.uuid + gateway.minimumCost + gateway.ordinal;
@@ -73,6 +84,7 @@ const MAGIC = {
   },
 
   forwardSpell: async (spell, destination) => {
+console.log('forwarding spell to: ', destination);
     return await fetch(destination, {
       method: 'post',
       body: JSON.stringify(spell),

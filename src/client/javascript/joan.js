@@ -33,7 +33,8 @@ const joan = {
   baseURL: 'https://dev.joan.allyabase.com/',
 
   createUser: async (hash, saveKeys, getKeys) => {
-    const keys = await sessionless.generateKeys(saveKeys, getKeys);
+    const keys = (await getKeys()) || (await sessionless.generateKeys(saveKeys, getKeys))
+    sessionless.getKeys = getKeys;
 
     const payload = {
       timestamp: new Date().getTime() + '',
