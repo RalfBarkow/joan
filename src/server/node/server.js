@@ -29,6 +29,7 @@ const bootstrap = async () => {
   try {
     const fountUser = await fount.createUser(db.saveKeys, db.getKeys);
     const bdoUUID = await bdo.createUser(bdoHash, {}, () => {}, db.getKeys);
+console.log(bdoUUID);
     const spellbooks = await bdo.getSpellbooks(bdoUUID, bdoHash);
     const joan = {
       uuid: 'joan',
@@ -62,6 +63,7 @@ app.use((req, res, next) => {
 });
 
 app.put('/user/create', async (req, res) => {
+console.log('got create user req');
   try {
     const body = req.body;
 console.log(body);
@@ -149,17 +151,17 @@ console.log('got spell req');
     const spellName = req.params.spellName;
     const spell = req.body;
     
-    switch(spellName) {
-      case 'joinup': const joinupResp = await MAGIC.joinup(spell);
-        return res.send(joinupResp);
-        break;
-      case 'linkup': const linkupResp = await MAGIC.linkup(spell);
-        return res.send(linkupResp);
-        break;
+    if(!MAGIC[spellName]) {
+console.log('sending this back');
+      res.status(404); 
+      res.send({error: 'spell not found'});
     }
-  
-    res.status(404);
-    res.send({error: 'spell not found'});
+    
+    let spellResp = {};
+    spellResp = await MAGIC[spellName](spell);
+console.log('spellResp', spellResp);
+    res.status(spellResp.success ? 200 : 900);
+    return res.send(spellResp);
   } catch(err) {
 console.warn(err);
     res.status(404);
