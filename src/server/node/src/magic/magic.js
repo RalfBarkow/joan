@@ -10,7 +10,7 @@ const MAGIC = {
   joinup: async (spell) => {
 console.log(spell);
     const spellName = spell.spell;
-    const gateway = await MAGIC.gatewayForSpell(spell.spellName);
+    const gateway = await MAGIC.gatewayForSpell(spellName);
     spell.gateways.push(gateway);
 
     const joan = await db.getUser('joan');
