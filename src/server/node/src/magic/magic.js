@@ -17,6 +17,7 @@ console.log(spell);
     const spellbooks = joan.spellbooks;
     const spellbook = spellbooks.filter(spellbook => spellbook[spellName]).pop();
     if(!spellbook) {
+console.log('spellbooks', spellbooks);
       throw new Error('spellbook not found');
     }
 
