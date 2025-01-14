@@ -4,7 +4,7 @@ import sessionless from 'sessionless-node';
 import superAgent from 'superagent';
 import { createHash } from 'crypto';
 
-const baseURL = 'http://127.0.0.1:3004/';
+const baseURL = process.env.DEV ? 'https://dev.joan.allyabase.com/' : 'http://127.0.0.1:3004/';
 
 const get = async function(path) {
   console.info("Getting " + path);
@@ -64,9 +64,12 @@ it('should get uuid, and save new pubKey', async () => {
   const timestamp = new Date().getTime() + '';
   const hash = digest;
 
+  let newKeys;
+  newKeys = await sessionless.generateKeys($ => newKeys = $, () => newKeys);
+
   const signature = await sessionless.sign(timestamp + hash);
 
-  const res = await get(`${baseURL}user/${hash}?timestamp=${timestamp}&signature=${signature}`);
+  const res = await get(`${baseURL}user/${hash}/pubKey/${newKeys.pubKey}?timestamp=${timestamp}&signature=${signature}`);
   res.status.should.equal(200);
 });
 
